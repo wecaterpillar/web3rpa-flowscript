@@ -24,6 +24,8 @@ const startRpa = async () => {
     // 3. rpa dev?
 }
 
+await startRpa()
+
 const loadRpaConfig = async () => {
     let  rpaConfig
     // load rpaConfig from dev.json
