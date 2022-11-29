@@ -2,16 +2,10 @@
   "name": "Web3RPA-localDev",
   "version": "1.0.0",
   "description": "Web3 RPA local Dev",
-  "main": "dec/rpa/rpaDev.js",
   "author": "gold",
   "license": "MIT",
-  "config": {
-    "forge": {
-      "packagerConfig": {}
-    }
-  },
   "scripts": {
-    "serve": "npm run dev"
+    "start": "node dev/rpa/rpaDev.js"
   },
   "dependencies": {
     "axios": "^0.20.0",
