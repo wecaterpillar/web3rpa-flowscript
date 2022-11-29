@@ -4,6 +4,7 @@ const func = (param) => {
 }
 exports = module.exports = {
     remoteServerInit : func,
+    getAccountCryptkeyRemote: func,
     getListDataRemote : func,
     getDetailDataRemote : func,
     updateDetailDataRemote : func,
