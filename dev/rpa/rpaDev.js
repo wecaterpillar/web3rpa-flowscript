@@ -21,7 +21,7 @@ const loadRpaConfig = async () => {
 }
 
 const runRpaDemo = () => {
-    const {flow_start} = require('../../proj-script/demo-baidu/baidu-visit')
+    const {flow_start} = require('../../flowscript/demo-baidu/baidu-visit')
     let item = {}
     let browser = {"browserKey":"demo01"}
     item['browser'] = browser
