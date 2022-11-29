@@ -148,5 +148,4 @@ lib/extensions/*
 userData/*
 !userData/.gitkeep
 logs
-nodeName
 
