@@ -5,6 +5,7 @@
   "appDataPath-demo-win":"%USERPROFILE%\\AppData\\Local\\Web3RPA",
   "isMac": true,
   "isLinux": false,
+  "isLocalDev": true,
   "localApiPort" : 3500,
   "localApi":"http://localhost:3500"
 }
