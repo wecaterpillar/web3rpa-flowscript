@@ -28,6 +28,15 @@ const runRpaDemo = () => {
     flow_start({item})
 }
 
+const runProjectScript = ({projctCode,scriptName}) =>{
+    const {flow_start} = require('../../flowscript/'+projctCode+'/'+scriptName)
+    // TODO query project account
+    let item = {}
+    let browser = {"browserKey":"demo01"}
+    item['browser'] = browser
+    flow_start({item})
+}
+
 const startRpa = async () => {
     console.debug('start rpa ...')
     //console.debug(rpaConfig)
@@ -47,8 +56,8 @@ const startRpa = async () => {
     browserInit(rpaConfig)
 
     // 3. rpa dev?
-    runRpaDemo()
-
+    //runRpaDemo()
+    runProjectScript({projctCode:'demo-baidu',scriptName:'baidu-visit'})
 }
 
 startRpa()
