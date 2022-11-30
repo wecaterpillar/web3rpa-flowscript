@@ -30,10 +30,8 @@ const runRpaDemo = () => {
 
 const runProjectScript = async ({projCode,scriptName}) =>{
     const {flow_start} = require('../../flowscript/'+projCode+'/'+scriptName)
-    // TODO query project account
     let projectResult
     let result = await getListData('w3_project_auto', {'code':projCode})
-    console.debug(result)
     if(result && result.records){
         projectResult = result.records[0]
     }
@@ -87,7 +85,11 @@ const startRpa = async () => {
 
     // 3. rpa dev?
     //runRpaDemo()
-    runProjectScript({projCode:'demo-baidu',scriptName:'baidu-visit'})
+    // 开发过程中可配置不同的项目和脚本
+    runProjectScript({
+        projCode:'demo-baidu',
+        scriptName:'baidu-visit'
+    })
 }
 
 startRpa()
