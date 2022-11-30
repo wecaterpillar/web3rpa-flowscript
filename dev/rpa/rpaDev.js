@@ -31,18 +31,18 @@ const runRpaDemo = () => {
 const runProjectScript = async ({projctCode,scriptName}) =>{
     const {flow_start} = require('../../flowscript/'+projctCode+'/'+scriptName)
     // TODO query project account
-    let projectInfo
+    let projectResult
     let queryParams = {}
     queryParams['code'] = projctCode
     let result = await getListData('w3_project_auto', queryParams)
     if(!!result && result.records){
-        projectInfo = result.records[0]
+        projectResult = result.records[0]
     }
-    if(!!projectInfo && 'id' in projectInfo){
+    if(!!projectResult && 'id' in projectResult){
         queryParams = {}
         queryParams['project_id'] = projectInfo['id']
         result = await getListData('w3_project_account',queryParams)
-        if(!!result && result.records.length>0){
+        if(!!result && result.records){
             for(i in result.records){
                 // 账号处理
                 let item = result.records[i]
