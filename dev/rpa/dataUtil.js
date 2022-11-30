@@ -5,7 +5,7 @@ const axios = require('axios')
 
 var rpaConfig
 // TODO 
-let useLocalApi = false
+let useLocalApi = true
 let localApiBase 
 
 const init = (config) => {
@@ -27,7 +27,13 @@ const init = (config) => {
 const getAccountCryptkey = async (params) => {
     if(useLocalApi){
         let url = localApiBase + '/api/getAccountCryptkey?w3'
-        return await axios.get(url, params)
+        let result
+        await axios.get(url, params).then(function (response){
+            if(response.status === 200){
+                result = response.data
+            } 
+        })
+        return result
     }else{
         let {getAccountCryptkeyRemote} = require('./remoteServer')
         return await getAccountCryptkeyRemote(params)
@@ -38,7 +44,13 @@ const getAccountCryptkey = async (params) => {
 const  getListData = async (tableKey, queryParams = {}) => {  
     if(useLocalApi){
         let url = localApiBase + '/api/getData/'+tableKey
-        return await axios.get(url, queryParams)
+        let result
+        await axios.get(url, queryParams).then(function (response){
+            if(response.status === 200){
+                result = response.data
+            } 
+        })
+        return result
     }else{
         let {getListDataRemote} = require('./remoteServer')
         return await getListDataRemote(tableKey, queryParams)
@@ -48,7 +60,13 @@ const  getListData = async (tableKey, queryParams = {}) => {
 const  getDetailData = async (tableKey, detailId) => {
     if(useLocalApi){
         let url = localApiBase + '/api/detail/'+tableKey+'/'+detailId
-        return await axios.get(url)
+        let result
+        await axios.get(url).then(function (response){
+            if(response.status === 200){
+                result = response.data
+            } 
+        })
+        return result
     }else{
         let {getDetailDataRemote} = require('./remoteServer')
         return await getDetailDataRemote(tableKey, detailId)
@@ -58,7 +76,13 @@ const  getDetailData = async (tableKey, detailId) => {
 const updateDetailData = async (tableKey, data) => {
     if(useLocalApi){
         let url = localApiBase + '/api/form/'+tableKey
-        return await axios.put(url, data)
+        let result
+        await axios.put(url, data).then(function (response){
+            if(response.status === 200){
+                result = response.data
+            } 
+        })
+        return result
     }else{
         let {updateDetailDataRemote} = require('./remoteServer')
         return await updateDetailDataRemote(tableKey, data)
@@ -68,7 +92,13 @@ const updateDetailData = async (tableKey, data) => {
 const createDetailData = async (tableKey, data) => {
     if(useLocalApi){
         let url = localApiBase + '/api/form/'+tableKey
-        return await axios.post(url, data)
+        let result
+        await axios.post(url, data).then(function (response){
+            if(response.status === 200){
+                result = response.data
+            } 
+        })
+        return result
     }else{
         let {createDetailDataRemote} = require('./remoteServer')
         return await createDetailDataRemote(tableKey, data)
@@ -154,8 +184,7 @@ const getAccountInfo = async ({type, account, isWeb3 = true, encryptKey}) => {
         let result = await getListData('w3_account',{'address': account})
         if(!!result && result.records.length>0){
             accountInfo = result.records[0]
-        }
-        
+        } 
     }else{
         let result = await getListData('w3_account2',{'type':type, 'username': account})
         if(!!result && result.records.length>0){
