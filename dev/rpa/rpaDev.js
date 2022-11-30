@@ -28,13 +28,47 @@ const runRpaDemo = () => {
     flow_start({item})
 }
 
-const runProjectScript = ({projctCode,scriptName}) =>{
+const runProjectScript = async ({projctCode,scriptName}) =>{
     const {flow_start} = require('../../flowscript/'+projctCode+'/'+scriptName)
     // TODO query project account
-    let item = {}
-    let browser = {"browserKey":"demo01"}
-    item['browser'] = browser
-    flow_start({item})
+    let projectInfo
+    let queryParams = {}
+    queryParams['code'] = projctCode
+    let result = await getListData('w3_project_auto', queryParams)
+    if(!!result && result.records){
+        projectInfo = result.records[0]
+    }
+    if(!!projectInfo && 'id' in projectInfo){
+        queryParams = {}
+        queryParams['project_id'] = projectInfo['id']
+        result = await getListData('w3_project_account',queryParams)
+        if(!!result && result.records.length>0){
+            for(i in result.records){
+                // 账号处理
+                let item = result.records[i]
+                // project
+                item['project'] = projectResult['code']
+                item['project_code'] = projectResult['code']
+                // 'w3_browser' - browserid
+                let browser = await getBrowserInfo({browserId:item['browser_id']})
+                if(browser){
+                browser['browserKey'] = browser['name']
+                item['browser'] = browser
+                }
+                // invoke
+                flow_start({item})
+            }
+        }
+    }else{
+        // no project found
+        let item = {}
+        let browser = {"browserKey":"demo01"}
+        item['browser'] = browser
+        flow_start({item})
+    }
+    
+
+
 }
 
 const startRpa = async () => {
