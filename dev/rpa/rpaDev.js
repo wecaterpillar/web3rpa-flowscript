@@ -1,9 +1,8 @@
 const fs = require("fs")
 const path = require('path')
 
-const { remoteServerInit } = require('./remoteServer')
-const { browserInit } = require('./browser')
-const { dataUtilInit, getListData, getDetailData, updateDetailData, createDetailData, getRpaPlanTaskList,getBrowserInfo} = require('./dataUtil')
+const browser = require('./browser')
+const dataUtil = require('./dataUtil')
 
 
 const rpaConfig = {}
@@ -31,13 +30,13 @@ const runRpaDemo = () => {
 const runProjectScript = async ({projCode,scriptName}) =>{
     const {flow_start} = require('../../flowscript/'+projCode+'/'+scriptName)
     let projectResult
-    let result = await getListData('w3_project_auto', {'code':projCode})
+    let result = await dataUtil.getListData('w3_project_auto', {'code':projCode})
     if(result && result.records){
         projectResult = result.records[0]
     }
     console.debug(projectResult)
     if(projectResult && 'id' in projectResult){
-        result = await getListData('w3_project_account',{'project_id':projectResult['id']})
+        result = await dataUtil.getListData('w3_project_account',{'project_id':projectResult['id']})
         if(!!result && result.records){
             for(i in result.records){
                 // 账号处理
@@ -46,23 +45,34 @@ const runProjectScript = async ({projCode,scriptName}) =>{
                 item['project'] = projCode
                 item['project_code'] = projCode
                 // 'w3_browser' - browserid
-                let browser = await getBrowserInfo({browserId:item['browser_id']})
-                if(browser){
-                    browser['browserKey'] = browser['name']
-                    item['browser'] = browser
+                let browserInfo = await dataUtil.getBrowserInfo({browserId:item['browser_id']})
+                if(browserInfo){
+                    browserInfo['browserKey'] = browserInfo['name']
+                    item['browser'] = browserInfo
                 }
                 // invoke
-                flow_start({item})
+                flow_start({item, rpaConfig:getSimpleRpaConfig()})
             }
         }
     }else{
         console.debug("no project found, test with demo")
         // no project found
         let item = {}
-        let browser = {"browserKey":"demo05"}
-        item['browser'] = browser
-        flow_start({item})
+        let browserInfo = {"browserKey":"demo05"}
+        item['browser'] = browserInfo
+        flow_start({item, rpaConfig})
     }
+}
+
+const getSimpleRpaConfig = () => {
+    // 复制必要的rpaConfig 配置信息
+    let rpaConfigJson = {}
+    rpaConfigJson.isMac = rpaConfig.isMac
+    rpaConfigJson.isLinux = rpaConfig.isLinux
+    // 数据目录
+    rpaConfigJson.appDataPath = rpaConfig.appDataPath
+    // local api
+    return rpaConfigJson
 }
 
 const startRpa = async () => {
@@ -78,10 +88,10 @@ const startRpa = async () => {
 
     // 2. init
     // 2.1 dataUtil
-    dataUtilInit(rpaConfig)
+    dataUtil.dataUtilInit(rpaConfig)
 
     // 2.2 browser
-    browserInit(rpaConfig)
+    browser.browserInit(rpaConfig)
 
     // 3. rpa dev?
     //runRpaDemo()
@@ -91,5 +101,6 @@ const startRpa = async () => {
         scriptName:'baidu-visit'
     })
 }
+
 
 startRpa()
