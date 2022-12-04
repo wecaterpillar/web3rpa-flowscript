@@ -1,7 +1,9 @@
 const fs = require("fs")
 const path = require('path')
+const log = require('electron-log')
 
 const dataUtil = require('./dataUtil')
+const browserUtil = require('./browserUtil')
 
 
 const rpaConfig = {}
@@ -50,7 +52,7 @@ const runProjectScript = async ({projCode,scriptName}) =>{
                     item['browser'] = browserInfo
                 }
                 // invoke
-                flow_start({item, rpaConfig:getSimpleRpaConfig()})
+                await flow_start({item, rpaConfig:getSimpleRpaConfig()})
             }
         }
     }else{
@@ -59,7 +61,7 @@ const runProjectScript = async ({projCode,scriptName}) =>{
         let item = {}
         let browserInfo = {"browserKey":"demo05"}
         item['browser'] = browserInfo
-        flow_start({item, rpaConfig})
+        await flow_start({item, rpaConfig})
     }
 }
 
@@ -90,7 +92,7 @@ const startRpa = async () => {
     dataUtil.dataUtilInit(rpaConfig)
 
     // 2.2 browser
-    browser.browserInit(rpaConfig)
+    browserUtil.browserInit(rpaConfig)
 
     // 3. rpa dev?
     //runRpaDemo()
