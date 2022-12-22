@@ -1,31 +1,57 @@
 const log = require('electron-log')
-const browserUtil = require('../../dev/rpa/browserUtil')
-const dataUtil = require('../../dev/rpa/dataUtil')
+const browserUtil = require('../../dist/rpa/browserUtil')
+const dataUtil = require('../../dist/rpa/dataUtil')
+const {flowAction, flowSetup, flowClose} = require('../../dist/rpa/rpaUtil')
 
-// 浏览器帮助类
-// 数据帮助类，可考虑调用localAPI来同rpaServer交互
+const flow_start2 = async ({item, rpaConfig}) => {
+    // first step
+    await flowSetup({item, rpaConfig})
 
-const flow_start =async ({ item, rpaConfig }) => {
-    console.debug("invoke flow_start")
-    console.debug(item)
+    // more actions
+    await flowAction('your name', async({item, page, context})=>{
+        let indexUrl = 'https://www.baidu.com/'
+        //console.debug(indexUrl)
+        await page.goto(indexUrl)
+        //await page.screenshot({path:path.join(rpaConfig.appDataPath, 'logs/1.png')})
+        // 回写数据到项目明细
+        item['update_time'] = dataUtil.getDateTime()
+        log.debug('will update item:'+ JSON.stringify(item))
+        if('id' in item){
+            await dataUtil.updateDetailData('w3_project_account', item)
+        }
+    })
+
+    // last step
+    await flowClose()
+}
+
+const flow_start = async ({item, rpaConfig}) => {
+    log.debug("invoke flow_start")
+    //log.debug(item)
+    dataUtil.dataUtilInit(rpaConfig)
     // // 浏览器参数初始化
-    // browserUtil.browserInit(rpaConfig)
-    // let browserConfig = await browserUtil.getBrowserConfig(item['browser'])
+    // browser.browserInit(rpaConfig)
+    // let browserConfig = await browser.getBrowserConfig(item['browser'])
     // // 启动浏览器
-    // let context = await browserUtil.launchBrowserContext(browserConfig)
-    let context = await browserUtil.launchBrowserContext2({ browserInfo: item['browser'], rpaConfigJson: rpaConfig })
-    //console.debug("context")
-    //console.debug(context)
-    const page = await context.newPage();
+    // let context = await browser.launchBrowserContext(browserConfig)
+    let context = await browserUtil.launchBrowserContext2({item,rpaConfig})
+    // const page = await context.newPage();
+    const page = await browserUtil.newPage(context);
     let indexUrl = 'https://www.baidu.com/'
     //console.debug(indexUrl)
     await page.goto(indexUrl)
+    let rpaAdmin = 'https://rpa.w3bb.cc'
+    await page.goto(rpaAdmin)
     //await page.screenshot({path:path.join(rpaConfig.appDataPath, 'logs/1.png')})
     // 回写数据到项目明细
     item['update_time'] = dataUtil.getDateTime()
-    log.debug('will update item:' + JSON.stringify(item))
-    await dataUtil.updateDetailData('w3_project_account', item)
-    await browserUtil.closeBrowserContext(context)
+    //log.debug('will update item:'+ JSON.stringify(item))
+    if('id' in item){
+        await dataUtil.updateDetailData('w3_project_account', item)
+    }
+    await browserUtil.closeBrowserContext(context, item)
+    log.debug('task flow complete')
+    return 0
 }
 
 exports = module.exports = {

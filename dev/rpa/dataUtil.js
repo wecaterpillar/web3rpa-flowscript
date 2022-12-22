@@ -2,6 +2,7 @@
 // 本地文件交互（包含本地数据库）
 const axios = require('axios')
 
+exports = module.exports = {}
 
 var rpaConfig
 // 默认使用localAPI
@@ -23,10 +24,11 @@ const init = (config) => {
     if( 'localApi' in rpaConfig){
         localApiBase = rpaConfig['localApi']
     }
-    if(useLocalApi && !localApiBase){
+    if(!localApiBase){
         localApiBase = 'http://localhost:3500'
     }    
 }
+exports.dataUtilInit = init
 
 /////////////////////////////////////////////////////////////
 /// commmon API with w3rpa server
@@ -60,6 +62,7 @@ const  getListData = async (tableKey, queryParams = {}) => {
         return result
     }
 }
+exports.getListData = getListData
 
 const  getDetailData = async (tableKey, detailId) => {
     if(!useLocalApi && remoteServer){
@@ -75,6 +78,7 @@ const  getDetailData = async (tableKey, detailId) => {
         return result
     }
 }
+exports.getDetailData = getDetailData
 
 const updateDetailData = async (tableKey, data) => {
     if(!useLocalApi && remoteServer){
@@ -90,6 +94,7 @@ const updateDetailData = async (tableKey, data) => {
         return result
     } 
 }
+exports.updateDetailData = updateDetailData
 
 const createDetailData = async (tableKey, data) => {
     if(!useLocalApi && remoteServer){
@@ -105,7 +110,46 @@ const createDetailData = async (tableKey, data) => {
         return result
     } 
 }
+exports.createDetailData = createDetailData
 
+const getRandUserAgent = async (params) => {
+    let result
+    if(!useLocalApi && remoteServer){
+        result = await remoteServer.getRandUserAgentRemote()
+    }else{
+        let url = localApiBase + '/api/rand-user-agent'
+        await axios.get(url, params).then(function (response){
+            if(response.status === 200){
+                result = response.data        
+            } 
+        })
+    } 
+    if(result && 'data' in result){
+        result = result['data']
+    }
+    return result
+}
+exports.getRandUserAgent = getRandUserAgent
+
+
+const getVisitorIp = async () => {
+    let result
+    if(!useLocalApi && remoteServer){
+        result = await remoteServer.getVisitorIpRemote()
+    }else{
+        let url = localApiBase + '/api/get-visitor-ip'
+        await axios.get(url).then(function (response){
+            if(response.status === 200){
+                result = response.data        
+            } 
+        })
+    } 
+    if(result && 'data' in result){
+        result = result['data']
+    }
+    return result
+}
+exports.getVisitorIp = getVisitorIp
 ///////////////////////////////////////////////////////////////////////////
 ////  specail API fro web3 RPA
 const AES = require('mysql-aes')
@@ -151,6 +195,8 @@ const getRpaPlanTaskList = (filterJson) => {
     return getListData('rpa_plan_task', queryParams)
 }
 
+exports.getRpaPlanTaskList = getRpaPlanTaskList
+
 /**
  * 获取RPA服务器浏览器配置信息
  * @param browserId 浏览器ID 
@@ -177,6 +223,7 @@ const getBrowserInfo = async ({browserId, browserKey, withProxy=false}) => {
     }
     return browser 
 }
+exports.getBrowserInfo = getBrowserInfo
 
 const getAccountInfo = async ({type, account, isWeb3 = true, encryptKey}) => {
     let accountInfo 
@@ -194,6 +241,7 @@ const getAccountInfo = async ({type, account, isWeb3 = true, encryptKey}) => {
     }
     return accountInfo
 }
+exports.getAccountInfo = getAccountInfo
 
 /**
  * 获取项目明细的web2账号密码
@@ -211,6 +259,7 @@ const loadProjectUserPassword = async (projectItem = {}) =>{
     }
     return password
 }
+exports.loadProjectUserPassword = loadProjectUserPassword
 
 /**
  * 获取web2账号的密码
@@ -228,6 +277,7 @@ const loadAccountUserPassword = async (accountItem = {}) => {
     }
     return password
 }
+exports.loadAccountUserPassword = loadAccountUserPassword
 
 /**
  * 获取web3账号私钥
@@ -245,6 +295,7 @@ const loadAccountPrivateKey = async (accountItem = {}) => {
     }
     return privateKey
 }
+exports.loadAccountPrivateKey = loadAccountPrivateKey
 
 /**
  * 获取web3账号助记词
@@ -262,25 +313,12 @@ const loadAccountMnemonic = async (accountItem = {}) => {
     }
     return mnemonic
 }
+exports.loadAccountMnemonic = loadAccountMnemonic
 
 function getDateTime() {
     const d_t = new Date()
     return d_t.getFullYear() + "-" + ("0"+(d_t.getMonth()+1)).slice(-2)+ "-" + ("0"+d_t.getDate()).slice(-2) 
      + " " + ("0"+d_t.getHours()).slice(-2) + ":" + d_t.getMinutes() + ":" + d_t.getSeconds()
 }
-
-exports = module.exports = {}
-
-exports.dataUtilInit = init
-exports.getListData = getListData
-exports.getDetailData = getDetailData
-exports.updateDetailData = updateDetailData
-exports.createDetailData = createDetailData
-exports.getRpaPlanTaskList = getRpaPlanTaskList
-exports.getBrowserInfo = getBrowserInfo
-exports.getAccountInfo = getAccountInfo
-exports.loadProjectUserPassword = loadProjectUserPassword
-exports.loadAccountUserPassword = loadAccountUserPassword
-exports.loadAccountPrivateKey = loadAccountPrivateKey
-exports.loadAccountMnemonic = loadAccountMnemonic
 exports.getDateTime = getDateTime
+
